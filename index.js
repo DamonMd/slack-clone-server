@@ -27,7 +27,6 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
-    console.log("token from context area", req.headers.xtoken);
     return { models, user: req.user, SECRET, SECRET2 };
   }
 });

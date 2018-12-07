@@ -9,14 +9,13 @@ export default {
         { where: { owner: user.id } },
         { raw: true }
       );
-      // const teams = await models.Team.findAll();
-      console.log("teams", teams);
       return teams;
     }
   },
   Mutation: {
     createTeam: requiresAuth.createResolver(
-      async (parent, { name }, { models, user }) => {
+      async (parent, args, { models, user }) => {
+        console.log("name??", args);
         try {
           if (name.length < 3 || name.length > 20) {
             return {
@@ -30,8 +29,14 @@ export default {
               ]
             };
           } else {
-            const team = await models.Team.create({ name, owner: user.id });
-            return { ok: true };
+            const team = await models.Team.create({ ...args, owner: user.id });
+            //channels belong to a team. find associated channels by passing a team's id i.e. the foreign key
+            await models.Channel.create({
+              name: "general",
+              public: true,
+              teamId: team.id
+            });
+            return { ok: true, team };
           }
         } catch (err) {
           console.log(err);
